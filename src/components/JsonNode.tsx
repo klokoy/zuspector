@@ -75,7 +75,7 @@ export function JsonNode({ value, label, depth = 0 }: Props) {
   }
 
   if (value !== null && typeof value === 'object') {
-    const keys = Object.keys(value as object);
+    const keys = Object.keys(value as object).filter(k => typeof (value as Record<string, unknown>)[k] !== 'function');
     if (keys.length === 0) return <div style={rowStyle}>{labelEl}<span style={{ color: COLORS.bracket }}>{'{}'}</span></div>;
     return (
       <div>
