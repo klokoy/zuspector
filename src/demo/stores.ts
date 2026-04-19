@@ -20,19 +20,31 @@ export const useCounterStore = create<CounterState>()(
   )
 );
 
+type User = { id: number; name: string; email: string; role: 'admin' | 'user' };
+
 type UserState = {
-  user: { name: string; email: string } | null;
+  users: User[];
+  activeUserId: number | null;
   theme: 'light' | 'dark';
-  setUser: (user: UserState['user']) => void;
+  setActiveUser: (id: number) => void;
+  addUser: (user: User) => void;
   toggleTheme: () => void;
 };
 
 export const useUserStore = create<UserState>()(
   devtools(
     set => ({
-      user: { name: 'Alice', email: 'alice@example.com' },
+      users: [
+        { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'admin' },
+        { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'user' },
+        { id: 3, name: 'Carol White', email: 'carol@example.com', role: 'user' },
+        { id: 4, name: 'David Brown', email: 'david@example.com', role: 'user' },
+        { id: 5, name: 'Eve Davis', email: 'eve@example.com', role: 'admin' },
+      ],
+      activeUserId: 1,
       theme: 'dark',
-      setUser: user => set({ user }, false, 'setUser'),
+      setActiveUser: id => set({ activeUserId: id }, false, 'setActiveUser'),
+      addUser: user => set(s => ({ users: [...s.users, user] }), false, 'addUser'),
       toggleTheme: () => set(s => ({ theme: s.theme === 'light' ? 'dark' : 'light' }), false, 'toggleTheme'),
     }),
     { name: 'UserStore' }

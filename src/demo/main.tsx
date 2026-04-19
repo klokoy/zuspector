@@ -7,7 +7,8 @@ import { useCounterStore, useUserStore } from './stores';
 
 function App() {
   const { count, increment, decrement, reset } = useCounterStore();
-  const { user, theme, toggleTheme } = useUserStore();
+  const { users, activeUserId, theme, setActiveUser, toggleTheme } = useUserStore();
+  const activeUser = users.find(u => u.id === activeUserId);
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: 32, background: theme === 'dark' ? '#111' : '#fff', minHeight: '100vh', color: theme === 'dark' ? '#eee' : '#111' }}>
@@ -26,7 +27,14 @@ function App() {
 
       <section>
         <h2>UserStore</h2>
-        <p>User: <strong>{user?.name ?? 'none'}</strong> ({user?.email})</p>
+        <p>Active user: <strong>{activeUser?.name ?? 'none'}</strong> ({activeUser?.email})</p>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+          {users.map(u => (
+            <button key={u.id} onClick={() => setActiveUser(u.id)} style={{ fontWeight: activeUserId === u.id ? 700 : 400 }}>
+              {u.name}
+            </button>
+          ))}
+        </div>
         <p>Theme: <strong>{theme}</strong></p>
         <button onClick={toggleTheme}>Toggle theme</button>
       </section>
