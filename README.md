@@ -51,6 +51,12 @@ export const useCounterStore = create()(
 );
 ```
 
+## Dev mode only
+
+`zuspector` is a no-op in production builds. The store interception and the `<Zuspector />` component both check `import.meta.env.DEV` (a Vite compile-time flag) and do nothing when it is `false`. In a production bundle, Vite replaces `import.meta.env.DEV` with `false` and tree-shakes the dead code, so no inspector logic ships to users.
+
+You can leave `<Zuspector />` in your component tree permanently — it renders nothing and intercepts nothing outside of a Vite dev server.
+
 ## How it works
 
 `zuspector` intercepts `window.__REDUX_DEVTOOLS_EXTENSION__` — the same hook used by the Redux DevTools browser extension. When a store with `devtools` middleware initializes, the inspector captures its name and subscribes to state updates. No browser extension is required.
