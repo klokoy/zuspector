@@ -6,6 +6,7 @@ A Zustand state inspector for React apps. Adds a floating button that opens a bo
 
 - React 18 or 19
 - Zustand 4 or 5
+- Vite — required for dev-mode detection (`import.meta.env.DEV`) and editor links (`/__open-in-editor`)
 - Stores must use the [`devtools` middleware](https://zustand.docs.pmnd.rs/middlewares/devtools) from `zustand/middleware`
 
 ## Installation
