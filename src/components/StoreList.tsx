@@ -48,6 +48,11 @@ export function StoreList({ selectedStore }: Props) {
       ) : (
         names.map(name => {
           const isSelected = name === selectedStore;
+          const storeState = stores.get(name)?.state ?? {};
+          const keys = Object.values(storeState);
+          const actionCount = keys.filter(v => typeof v === 'function').length;
+          const fieldCount = keys.length - actionCount;
+
           return (
             <button
               key={name}
@@ -58,13 +63,21 @@ export function StoreList({ selectedStore }: Props) {
                 textAlign: 'left',
                 padding: '8px 12px',
                 cursor: 'pointer',
-                fontSize: 13,
                 color: isSelected ? '#9cdcfe' : '#ccc',
                 borderLeft: isSelected ? '2px solid #4fc3f7' : '2px solid transparent',
                 fontFamily: 'monospace',
+                width: '100%',
               }}
             >
-              {name}
+              <div style={{ fontSize: 13, marginBottom: 3 }}>{name}</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <span style={{ fontSize: 11, color: isSelected ? '#6fa8d0' : '#555' }}>
+                  {fieldCount} {fieldCount === 1 ? 'field' : 'fields'}
+                </span>
+                <span style={{ fontSize: 11, color: isSelected ? '#5a9e5a' : '#444' }}>
+                  {actionCount} {actionCount === 1 ? 'action' : 'actions'}
+                </span>
+              </div>
             </button>
           );
         })
