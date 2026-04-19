@@ -1,6 +1,10 @@
 export type StoreEntry = {
   name: string;
   state: Record<string, unknown>;
+  // Captured on init — used to log function references to Chrome DevTools
+  actionRefs: Map<string, () => void>;
+  // URL of the store's source file on the dev server (used for VS Code links)
+  fileUrl: string | null;
 };
 
 const storeMap = new Map<string, StoreEntry>();
@@ -14,12 +18,18 @@ function wrapConnection(name: string, real: Record<string, unknown> | undefined)
   return {
     ...(real ?? {}),
     init(state: Record<string, unknown>) {
-      storeMap.set(name, { name, state });
+      const actionRefs = new Map(
+        Object.entries(state)
+          .filter((entry): entry is [string, () => void] => typeof entry[1] === 'function')
+      );
+      const fileUrl = captureStoreFileUrl();
+      storeMap.set(name, { name, state, actionRefs, fileUrl });
       notifyListeners();
       (real?.init as ((s: unknown) => void) | undefined)?.(state);
     },
     send(action: unknown, state: Record<string, unknown>) {
-      storeMap.set(name, { name, state });
+      const existing = storeMap.get(name);
+      storeMap.set(name, { name, state, actionRefs: existing?.actionRefs ?? new Map(), fileUrl: existing?.fileUrl ?? null });
       notifyListeners();
       (real?.send as ((a: unknown, s: unknown) => void) | undefined)?.(action, state);
     },
@@ -40,6 +50,25 @@ function buildProxiedExtension(realExt: Record<string, unknown> | undefined) {
       return wrapConnection(name, realConn);
     },
   };
+}
+
+// Used to filter our own file out of the Error stack when detecting store source URLs
+const SELF_PATH = new URL(import.meta.url).pathname;
+
+function captureStoreFileUrl(): string | null {
+  try {
+    const stack = new Error().stack ?? '';
+    for (const line of stack.split('\n').slice(1)) {
+      const match = line.match(/https?:\/\/[^\s)]+/);
+      if (!match) continue;
+      // Strip query params and trailing :line:col added by V8 stack traces
+      const url = match[0].split('?')[0].replace(/:\d+:\d+$/, '');
+      if (url.includes('/node_modules/')) continue;
+      if (new URL(url).pathname === SELF_PATH) continue;
+      return url;
+    }
+  } catch { /* */ }
+  return null;
 }
 
 let patched = false;

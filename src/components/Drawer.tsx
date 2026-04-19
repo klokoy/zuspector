@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toggleSettings } from '../store';
+import { Settings } from './Settings';
 import { StoreList } from './StoreList';
 import { StateViewer } from './StateViewer';
 
@@ -9,9 +11,11 @@ const DEFAULT_HEIGHT = Math.round(window.innerHeight * 0.55);
 type Props = {
   isOpen: boolean;
   selectedStore: string | null;
+  showSettings: boolean;
+  showEditorLinks: boolean;
 };
 
-export function Drawer({ isOpen, selectedStore }: Props) {
+export function Drawer({ isOpen, selectedStore, showSettings, showEditorLinks }: Props) {
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
   const dragging = useRef(false);
   const startY = useRef(0);
@@ -86,6 +90,7 @@ export function Drawer({ isOpen, selectedStore }: Props) {
         style={{
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           padding: '6px 16px',
           borderBottom: '1px solid #2a2a2a',
           flexShrink: 0,
@@ -94,11 +99,29 @@ export function Drawer({ isOpen, selectedStore }: Props) {
         <span style={{ fontSize: 12, fontWeight: 600, color: '#4fc3f7', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
           ZUSPECTOR
         </span>
+        <button
+          onClick={toggleSettings}
+          title="Settings"
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: showSettings ? '#4fc3f7' : '#555',
+            fontSize: 16,
+            lineHeight: 1,
+            padding: '2px 4px',
+            borderRadius: 4,
+          }}
+        >
+          ⚙
+        </button>
       </div>
+
+      {showSettings && <Settings showEditorLinks={showEditorLinks} />}
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <StoreList selectedStore={selectedStore} />
-        <StateViewer storeName={selectedStore} />
+        <StateViewer storeName={selectedStore} showEditorLinks={showEditorLinks} />
       </div>
     </div>
   );

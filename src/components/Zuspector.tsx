@@ -3,12 +3,17 @@ import { FabButton } from './FabButton';
 import { Drawer } from './Drawer';
 
 export function Zuspector() {
-  const { isOpen, selectedStore } = useZuspectorState();
+  const { isOpen, selectedStore, showSettings, settings } = useZuspectorState();
 
   return (
     <>
       <FabButton isOpen={isOpen} />
-      <Drawer isOpen={isOpen} selectedStore={selectedStore} />
+      <Drawer
+        isOpen={isOpen}
+        selectedStore={selectedStore}
+        showSettings={showSettings}
+        showEditorLinks={settings.showEditorLinks}
+      />
     </>
   );
 }
