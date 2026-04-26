@@ -3,7 +3,6 @@ import { FabButton } from './FabButton';
 import { Drawer } from './Drawer';
 
 export function Zuspector() {
-  if (!import.meta.env.DEV) return null;
   const { isOpen, selectedStore, showSettings, settings } = useZuspectorState();
 
   return (
